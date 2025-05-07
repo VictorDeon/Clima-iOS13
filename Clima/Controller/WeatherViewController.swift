@@ -16,7 +16,7 @@ class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManag
     @IBOutlet weak var cityLabel: UILabel!
     @IBOutlet weak var searchTextField: UITextField!
     
-    var weather = WeatherManager(apiKey: "...")
+    var weather = WeatherManager(apiKey: "")
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,8 +57,17 @@ class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManag
         searchTextField.text = ""
     }
     
-    func didUpdateWeather(weather: Weather) {
-        print(weather.conditionName)
+    // Como esse método roda em background precisamos inserir em uma queue para a thread principal novamente
+    // para modificar os itens da tela, pois não sabemos quando a requisição http será finalizada.
+    func didUpdateWeather(_ weatherManager: WeatherManager, weather: Weather) {
+        DispatchQueue.main.async {
+            self.temperatureLabel.text = weather.temperatureString
+            self.conditionImageView.image = UIImage(systemName: weather.conditionName)
+        }
+    }
+    
+    func didFailWithError(error: Error) {
+        print(error)
     }
     
 }
