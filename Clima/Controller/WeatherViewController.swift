@@ -9,20 +9,21 @@
 import UIKit
 
 // UITextFieldDelegate é do tipo protocol, que em OO é conhecido como Interface
-class WeatherViewController: UIViewController, UITextFieldDelegate {
+class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManagerDelegate {
 
     @IBOutlet weak var conditionImageView: UIImageView!
     @IBOutlet weak var temperatureLabel: UILabel!
     @IBOutlet weak var cityLabel: UILabel!
     @IBOutlet weak var searchTextField: UITextField!
     
-    var weather = Weather(apiKey: "...")
+    var weather = WeatherManager(apiKey: "...")
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Padrao de projeto Delegate que faz funcionar alguns metodos definidos no protocolo
         // UITextFieldDelegate para manipular eventos do UITextField
         searchTextField.delegate = self
+        weather.delegate = self
     }
 
     @IBAction func searchPressed(_ sender: UIButton) {
@@ -54,6 +55,10 @@ class WeatherViewController: UIViewController, UITextFieldDelegate {
         }
         
         searchTextField.text = ""
+    }
+    
+    func didUpdateWeather(weather: Weather) {
+        print(weather.conditionName)
     }
     
 }

@@ -1,42 +1,30 @@
-import Foundation
 
 struct Weather {
-    let weatherURL: String
-    
-    init(apiKey: String) {
-        self.weatherURL = "https://api.openweathermap.org/data/2.5/weather?appid=\(apiKey)&units=metric"
+    let conditionId: Int
+    let cityName: String
+    let temperature: Double
+    // Computed Property
+    var temperatureString: String {
+        return String(format: "%.1f", temperature)
     }
-    
-    func getWeather(_ city: String) {
-        let url = "\(weatherURL)&q=\(city)"
-        performRequest(url)
-    }
-    
-    func performRequest(_ urlString: String) {
-        // Create a URL
-        if let url = URL(string: urlString) {
-            // Create a URL Session
-            let session = URLSession(configuration: .default)
-            
-            // Give the session a task
-            // Quando a task finalizar, ele vai executar o metodo que esta no completionHandler
-            // Esse handler vai receber 3 parametros data, response e error
-            let task = session.dataTask(with: url, completionHandler: handle(data: response: error:))
-            
-            // Start the task
-            task.resume()
-        }
-    }
-    
-    func handle(data: Data?, response: URLResponse?, error: Error?) -> Void {
-        if error != nil {
-            print(error!)
-            return
-        }
-        
-        if let safeData = data {
-            let dataString = String(data: safeData, encoding: .utf8)
-            print(dataString ?? "")
+    var conditionName: String {
+        switch conditionId {
+            case 200...232:
+                return "cloud.bolt"
+            case 300...321:
+                return "cloud.drizzle"
+            case 500...531:
+                return "cloud.rain"
+            case 600...622:
+                return "cloud.snow"
+            case 701...781:
+                return "cloud.fog"
+            case 800:
+                return "sun.max"
+            case 801...804:
+                return "cloud.bolt"
+            default:
+                return "cloud"
         }
     }
 }
