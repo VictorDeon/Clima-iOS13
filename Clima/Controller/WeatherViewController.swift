@@ -10,7 +10,7 @@ import UIKit
 import CoreLocation
 
 // UITextFieldDelegate é do tipo protocol, que em OO é conhecido como Interface
-class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManagerDelegate {
+class WeatherViewController: UIViewController, UITextFieldDelegate {
 
     @IBOutlet weak var conditionImageView: UIImageView!
     @IBOutlet weak var temperatureLabel: UILabel!
@@ -64,6 +64,14 @@ class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManag
         searchTextField.text = ""
     }
     
+    @IBAction func locationPressed(_ sender: UIButton) {
+        locationManager.requestLocation()
+    }
+}
+
+// MARK: - WeatherManagerDelegate
+
+extension WeatherViewController: WeatherManagerDelegate {
     // Como esse método roda em background precisamos inserir em uma queue para a thread principal novamente
     // para modificar os itens da tela, pois não sabemos quando a requisição http será finalizada.
     func didUpdateWeather(_ weatherManager: WeatherManager, weather: Weather) {
@@ -72,10 +80,6 @@ class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManag
             self.conditionImageView.image = UIImage(systemName: weather.conditionName)
             self.cityLabel.text = weather.cityName
         }
-    }
-    
-    @IBAction func locationPressed(_ sender: UIButton) {
-        locationManager.requestLocation()
     }
 
     func didFailWithError(error: Error) {
