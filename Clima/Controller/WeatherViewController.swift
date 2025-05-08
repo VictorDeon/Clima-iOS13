@@ -10,7 +10,7 @@ import UIKit
 import CoreLocation
 
 // UITextFieldDelegate é do tipo protocol, que em OO é conhecido como Interface
-class WeatherViewController: UIViewController, UITextFieldDelegate {
+class WeatherViewController: UIViewController {
 
     @IBOutlet weak var conditionImageView: UIImageView!
     @IBOutlet weak var temperatureLabel: UILabel!
@@ -38,6 +38,14 @@ class WeatherViewController: UIViewController, UITextFieldDelegate {
         searchTextField.endEditing(true)
     }
     
+    @IBAction func locationPressed(_ sender: UIButton) {
+        locationManager.requestLocation()
+    }
+}
+
+// MARK: - UITextFieldDelegate
+
+extension WeatherViewController: UITextFieldDelegate {
     // Ao clicar no botao de return (enviar ou Go) do teclado dispara esse metodo
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         print(searchTextField.text!)
@@ -62,10 +70,6 @@ class WeatherViewController: UIViewController, UITextFieldDelegate {
         }
         
         searchTextField.text = ""
-    }
-    
-    @IBAction func locationPressed(_ sender: UIButton) {
-        locationManager.requestLocation()
     }
 }
 
