@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreLocation
 
 // UITextFieldDelegate é do tipo protocol, que em OO é conhecido como Interface
 class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManagerDelegate {
@@ -16,14 +17,20 @@ class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManag
     @IBOutlet weak var cityLabel: UILabel!
     @IBOutlet weak var searchTextField: UITextField!
     
-    var weather = WeatherManager(apiKey: "")
-    
+    var weather = WeatherManager(apiKey: "...")
+    let locationManager = CLLocationManager()
+
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Mostra o popup pedindo autorização para usar a localização
+        locationManager.delegate = self
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.requestLocation()
         // Padrao de projeto Delegate que faz funcionar alguns metodos definidos no protocolo
+        weather.delegate = self
         // UITextFieldDelegate para manipular eventos do UITextField
         searchTextField.delegate = self
-        weather.delegate = self
     }
 
     @IBAction func searchPressed(_ sender: UIButton) {
@@ -63,12 +70,35 @@ class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManag
         DispatchQueue.main.async {
             self.temperatureLabel.text = weather.temperatureString
             self.conditionImageView.image = UIImage(systemName: weather.conditionName)
+            self.cityLabel.text = weather.cityName
         }
     }
     
+    @IBAction func locationPressed(_ sender: UIButton) {
+        locationManager.requestLocation()
+    }
+
     func didFailWithError(error: Error) {
         print(error)
     }
-    
 }
 
+// MARK: - CLLocationManagerDelegate
+
+extension WeatherViewController: CLLocationManagerDelegate {
+    // Executado toda vez que for requirido a location a partir do locationManager.requestLocation()
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        print("Got location update")
+        if let location = locations.last {
+            locationManager.stopUpdatingLocation()
+            let lat = location.coordinate.latitude
+            let lon = location.coordinate.longitude
+            weather.getWeather(lat: Float(lat), lon: Float(lon))
+        }
+    }
+    
+    // Executado se der algum error ao tentar pegar a localização.
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print(error)
+    }
+}
